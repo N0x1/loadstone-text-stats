@@ -1,3 +1,3 @@
-# Project engineering instructions
+# Contributing
 
-Read the project brief and acceptance criteria. Preserve existing work. Use dependency-free Node.js modules and focused tests; no dependency installs or network commands are authorized by this starter. Foreman owns Git, contained CI, packaging and delivery. Never commit, merge, push or publish from model tools. Write only in your assigned task worktree. Generated starter tests are not product completion evidence.
+Preserve existing work and keep the command-line interface compatible. Use Node.js built-ins; discuss new dependencies before adding them. Run the automated tests and runtime check after code changes. Keep generated files out of source control. Documentation should describe the product and show tested examples. Commit, merge and publish only with the repository owner's approval.

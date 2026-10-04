@@ -2,7 +2,7 @@
 import { readFile } from 'node:fs/promises';
 import { countText } from './app.mjs';
 
-const help = `Loadstone Text Stats — local, dependency-free text counts
+const help = `Text Stats — count characters, words and lines
 
 Usage:
   node src/cli.mjs --text STRING [--json]

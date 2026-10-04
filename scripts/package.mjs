@@ -89,7 +89,6 @@ export function packageProject(root, outputDir) {
     }
   }
   const entries = PACKAGE_FILES.filter(name => {
-    // CLI tests arrive through the parallel CLI and dependent runtime tasks.
     if (['test/cli.test.mjs', 'test/text-argument.test.mjs'].includes(name)
         && !existsSync(path.join(root, name))) return false;
     return true;

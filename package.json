@@ -1,14 +1,14 @@
 {
-  "name": "loadstone-text-stats",
-  "version": "0.1.0",
+  "name": "text-stats",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
-  "description": "Dependency-free offline CLI for Unicode character, word and line counts",
+  "description": "Count characters, words and lines from text or standard input.",
   "engines": {
     "node": ">=22"
   },
   "bin": {
-    "loadstone-text-stats": "src/cli.mjs"
+    "text-stats": "src/cli.mjs"
   },
   "files": [
     "src/",
@@ -24,5 +24,10 @@
     "start": "node src/cli.mjs",
     "runtime-check": "node scripts/runtime-check.mjs",
     "package": "node scripts/package.mjs"
+  },
+  "author": "Noxie",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/N0x1/text-stats.git"
   }
 }

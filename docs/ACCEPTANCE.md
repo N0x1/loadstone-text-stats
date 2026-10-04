@@ -1,62 +1,38 @@
-# Acceptance and delivery gates
+# Development
 
-## Intended local checks (Node 22+)
+Use Node.js 22 or later. The project uses built-in modules and does not need a dependency install.
 
-Run from the source root, then repeat from a fresh ZIP extraction:
+## Run the checks
 
-1. `node --test`: counting edge cases, actual CLI tests, ZIP headers/offsets,
-   CRC-32, path rejection, deterministic bytes, allowlist, SHA-256 and unchanged
-   source bytes. Packaging tests use isolated temporary directories.
-2. `node scripts/runtime-check.mjs`: execute the actual CLI for text, UTF-8 stdin,
-   JSON, help/version and invalid arguments. Check packaged source bytes before
-   and after; this is separate from unit tests.
-3. `node scripts/package.mjs`: build the offline ZIP and `SHA256SUMS`.
-4. Verify its digest with built-in Node, from the artifact directory:
+From the project directory:
 
 ```sh
-node --input-type=module -e "import {readFileSync} from 'node:fs'; import {createHash} from 'node:crypto'; import assert from 'node:assert/strict'; const m=readFileSync('SHA256SUMS','utf8').trim(); const match=/^([a-f0-9]{64})  ([A-Za-z0-9][A-Za-z0-9._-]*[.]zip)$/.exec(m); assert.ok(match,'Invalid manifest'); assert.equal(createHash('sha256').update(readFileSync(match[2])).digest('hex'),match[1]); console.log('SHA-256 verified');"
+node --test
+node scripts/runtime-check.mjs
 ```
 
-5. Extract into a fresh empty directory with a ZIP utility; confirm no absolute
-   paths or traversal entries, then run `node src/cli.mjs --text "Hello 😀" --json`,
-   expecting `{"characters":7,"words":2,"lines":1}`. Run help, version, tests
-   and runtime checks from that extraction without npm install.
-6. Confirm the original allowlisted files remain byte-for-byte unchanged after
-   runtime checks and packaging, and that only intended files are in the ZIP.
+The test suite covers the calculation rules, command-line behavior and archive builder. The runtime check starts the actual CLI and checks its output. It also verifies that running the CLI leaves packaged source files unchanged.
 
-The manifest hashes the ZIP itself. CRC-32 validates individual ZIP entries;
-SHA-256 detects artifact changes, but neither authenticates an untrusted sender.
-Repackaging the same inputs produces the same ZIP bytes. The manifest and ZIP
-stay outside the packaged inputs. The CLI and text-argument regression test
-files are optional allowlist entries until their owning tasks are integrated;
-final delivery must include both and the completed runtime checks.
+Some archive tests need permission to create symbolic links. Node reports those cases as skipped when the host denies that permission; a skipped case has not been tested.
 
-## Product contract
+## Build a ZIP
 
-Characters count Unicode code points; words are nonempty whitespace-separated
-tokens. Empty text returns all zeros. Split nonempty input on CRLF or LF and
-remove one terminal empty segment: interior blank lines count and a trailing
-newline adds no line. Lone CR is not a separator. JSON exposes exactly the
-three numeric keys; errors go to stderr with a nonzero exit status.
-See the README for flags, stdin precedence and usage.
+```sh
+node scripts/package.mjs
+```
 
-## Evidence status
+This creates `artifacts/dist/text-stats-0.1.1.zip` and `artifacts/dist/SHA256SUMS`. The archive contains the files listed in the packaging script, including source, documentation and tests. Rebuilding unchanged inputs produces the same bytes.
 
-At documentation preparation, local unit checks, runtime checks, ZIP extraction,
-hash verification and unchanged-source checks are **pending Foreman execution
-and lead review**. No executed test results or Node runtime compatibility evidence
-are asserted by these instructions. The starter checks are not product evidence.
+To test a package, extract it into a new empty directory and run the two check commands there. Then try the Quick start example from the README. No installation step is needed.
 
-Before delivery, record actual Node version, commands/results, artifact filename
-and SHA-256, extraction results and immutability results in the review record.
-Keep compilation/syntax checks, unit checks, black-box runtime checks, artifact
-verification and remote delivery evidence distinct.
+## Verify a download
 
-## Authorized public delivery
+GitHub releases include the runnable ZIP and a separate JSON manifest containing SHA-256 file and archive hashes. Compare the downloaded ZIP's SHA-256 with the value recorded in its manifest. Locally built ZIPs use the checksum file above.
 
-Foreman handles publication only after authorization and review/merge approval.
-Requested public destination: `N0x1/loadstone-text-stats`. Upload reviewed source,
-documentation, runnable ZIP and hash manifest; verify public remote contents,
-downloaded artifact hash and working repository/release links. Local success
-does not prove publication, link availability or remote integrity. No repository
-or release URL is asserted until verified delivery evidence exists.
+On PowerShell:
+
+```powershell
+Get-FileHash .\source-and-runnable.zip -Algorithm SHA256
+```
+
+On macOS, use `shasum -a 256 source-and-runnable.zip`; on Linux, use `sha256sum source-and-runnable.zip`. Matching hashes show that the files match the recorded download. They do not establish who created a file.
