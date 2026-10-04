@@ -1,0 +1,2 @@
+# loadstone-text-stats
+Loadstone delivery 07e2afb4-3f80-4325-bb50-8b9c31fe64e2; manifest 3ed8180b3f613c4ac1a4576652f95b1b3268df203a61c28edc3cba4bc8809bb3
